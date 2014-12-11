@@ -4,8 +4,7 @@ import string
 import random
 import tornado
 from tornado.ioloop import IOLoop
-from tornado.httpserver import  HTTPServer
-from tornado.process import fork_processes
+from tornado.httpserver import HTTPServer
 from tornado.web import RequestHandler, Application, url
 import hashlib
 import sys, os
@@ -13,7 +12,17 @@ sys.path.append(os.path.dirname(__file__))
 
 import loremipsum
 
+
 class HelloHandler(RequestHandler):
+
+    """
+    This is a quite simple server:
+
+    1. Whole page is generated randomly
+    2. Random seed is derived from request path.
+
+    So for every url you have unique webpage.
+    """
 
     @tornado.web.authenticated
     def get(self):
@@ -59,17 +68,22 @@ class Login(RequestHandler):
             self.set_secure_cookie("logged_in", "true")
         self.redirect("/")
 
+
 class Logout(RequestHandler):
+
     def get(self):
        self.clear_cookie("logged_in")
        self.redirect("/")
 
+
 def make_app():
+
     return Application([
         url(r"/login", Login),
         url(r"/logout", Logout),
         url(r"/.*", HelloHandler)],
         cookie_secret="4") # Choosen by a fair dice roll
+
 
 def main():
     app = make_app()
